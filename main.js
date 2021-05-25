@@ -11,9 +11,10 @@ let m = "If you can read this message, it means that you've succesfully implment
 console.log("message:", m);
 
 // Due to the issue of computational precision,
-// 13 is the biggest number of bits that won't cause wrong results when decrypting.
+// 25 is the biggest number of bits that won't cause wrong results when converting to p, q to decimal,
+// and calculating p*q.
 // However, a RSA scheme is believed to be secure only when n > 1024 nowadays.
-let primePair = rsa.randomPrimePair(13);
+let primePair = rsa.randomPrimePair(25);
 let p = primePair[0];
 let q = primePair[1];
 // console.log(p, q);
