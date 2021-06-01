@@ -123,7 +123,7 @@ export class PrimeTool {
         let big = Math.max(a, b);
         let small = Math.min(a, b);
         if (big % small == 0) return small;
-        const upperBound = Math.ceil(small ** 0.5);
+        const upperBound = Math.ceil(small / 2);
         for (let i = upperBound; i >= 1; i--) {
             if (big % i == 0 && small % i == 0) return i;
         }
@@ -172,11 +172,11 @@ export class PrimeTool {
     }
     eulerFunction(n) {
         // this function returns the number of positive integers that are less than n and relatively prime with n
+        // if n is a prime
+        if (this.isPrime(n)) return n - 1;
+        // else if n is the product of two different primes
         let primeFactorResult = this.primeFactorization(n)
         let primeList = Object.keys(primeFactorResult);
-        // if n is a prime
-        if (primeList.length == 1) return primeList[0] - 1;
-        // else if n is the product of two primes
         if (primeList.length == 2) {
             let allExponentAreOne = true;
             for (let each in primeFactorResult) {
