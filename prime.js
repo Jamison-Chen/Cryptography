@@ -125,7 +125,7 @@ export class PrimeTool {
         if (big % small == 0) return small;
         const upperBound = Math.ceil(small / 2);
         for (let i = upperBound; i >= 1; i--) {
-            if (big % i == 0 && small % i == 0) return i;
+            if (small % i == 0 && big % i == 0) return i;
         }
     }
     gcd_euclidean(a, b, matrix) { // fast, only used for acquiring linear combination

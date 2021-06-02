@@ -4,8 +4,12 @@ import {
 import {
     PrimeTool
 } from "./prime.js";
+import {
+    Dlog
+} from "./discreteLog.js";
 let rsa = new RSA();
 let pt = new PrimeTool();
+let dlog = new Dlog();
 
 function run1() {
     let m = "If you can read this message, it means that you've succesfully implmented the RSA algorithm!";
@@ -37,8 +41,54 @@ function run1() {
 }
 
 function run2() {
-    for (let i = 3000; i <= 4000; i++) {
-        // console.log(i, pt.eulerFunction(i));
+    for (let i = 2; i <= 3000; i++) {
+        // you will find out that it's hard to find a euler function's value that is a prime
         if (pt.isPrime(pt.eulerFunction(i))) console.log(i, pt.eulerFunction(i));
     }
 }
+
+function run3() {
+    // when p is large enough, it would take some time to generate zpStar
+    // but it's still quite fast to find the smallest generator
+    let p = rsa.randomPrimePair(16)[0];
+    console.log(p);
+    let zpStar = new Set(pt.relativePrimeList(p));
+    console.log(zpStar.size);
+    let g = dlog.findSmallestGenerator(zpStar, p);
+    console.log(g);
+}
+
+function run4() {
+    const q = rsa.randomPrimePair(14)[0];
+    console.log(q)
+    let g = dlog.genPrimeOrderSubgroupOfZpStar(q);
+    console.log(g.size); // this number should equals q
+    let pAndT = dlog.genPrimeEqualTQplusOne(q);
+    console.log(pAndT);
+    // the for loop below should only print out 1 by definition
+    for (let each of g) {
+        if (!dlog.isGenerator(g, each, pAndT.p)) console.log(each);
+    }
+}
+
+function run5() {
+    const q = rsa.randomPrimePair(20)[0];
+    const group = dlog.genPrimeOrderSubgroupOfZpStar(q);
+    const pAndT = dlog.genPrimeEqualTQplusOne(q);
+    console.log(pAndT);
+
+    // the 0th element in the groupArray below must be the identity,
+    // which isn't a generator,
+    // so we choose the 1st one instead.
+    let g = Array.from(group)[1];
+    let h = dlog.getRandomElemInGroup(group);
+    console.log({
+        "g": g,
+        "h": h
+    });
+
+    let ans = dlog.logBaseGofH(group, g, h);
+    console.log(ans);
+}
+
+run5();
