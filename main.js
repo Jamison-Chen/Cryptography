@@ -16,31 +16,31 @@ let rsa = new RSA();
 let dlog = new Dlog();
 
 function run1() {
-    let m = "If you can read this message, it means that you've succesfully implmented the RSA algorithm!";
+    const m = "If you can read this message, it means that you've succesfully implmented the RSA algorithm!";
     console.log("message:", m);
     // Due to the issue of computational precision,
     // 25 is the biggest number of bits that won't cause wrong results when converting to p, q to decimal,
     // and calculating p*q.
     // However, a RSA scheme is believed to be secure only when n > 1024 nowadays.
-    let primePair = ct.randomPrimePair(22);
-    let p = primePair[0];
-    let q = primePair[1];
+    const primePair = ct.randomPrimePair(22);
+    const p = primePair[0];
+    const q = primePair[1];
     // console.log(p, q);
     // console.log(`φ(${p}) =`, pt.eulerFunction(p));
     // console.log(`φ(${q}) =`, pt.eulerFunction(q));
     // console.log(`φ(${p*q}) =`, pt.eulerFunction(p * q));
-    let keyPair = rsa.genKeyPair(p, q);
+    const keyPair = rsa.genKeyPair(p, q);
     console.log(keyPair.publicKey);
 
-    let mList = ct.string2asciiCodeList(m);
-    let cList = rsa.encrypt(mList, keyPair.publicKey);
-    let c = ct.asciiCodeList2string(cList, true);
+    const mList = ct.string2asciiCodeList(m);
+    const cList = rsa.encrypt(mList, keyPair.publicKey);
+    const c = ct.asciiCodeList2string(cList, true);
     console.log("crypto:", c);
 
-    let dListTrue = rsa.decrypt(cList, keyPair.privateKey);
+    const dListTrue = rsa.decrypt(cList, keyPair.privateKey);
     console.log("answer:", ct.asciiCodeList2string(dListTrue));
 
-    let dListFound = rsa.decrypt(cList, rsa.bruteForceFindKey(keyPair.publicKey));
+    const dListFound = rsa.decrypt(cList, rsa.bruteForceFindKey(keyPair.publicKey));
     console.log("guess:", ct.asciiCodeList2string(dListFound));
 }
 
@@ -76,34 +76,35 @@ function run4() {
 }
 
 function run5() {
-    let m = "If you can read this message, it means that you've succesfully implmented the Dlog algorithm!";
+    const m = "If you can read this message, it means that you've succesfully implmented the Dlog algorithm!";
     console.log("message:", m);
     // choose a bigger prime p and a smaller prime q
     // s.t. p = t * q + 1
-    let p = 0;
     let q = ct.randomPrimePair(8)[0];
     while (q < 128) {
         q = ct.randomPrimePair(8)[0];
     }
     console.log("q", q);
+    let p = 0;
     while (p <= q || ct.modularExp(p, 1, q) != 1) {
-        p = ct.randomPrimePair(24)[0];
+        p = ct.randomPrimePair(26)[0];
     }
     console.log("p", p);
-    let keyPair = dlog.genKeyPair(p, q);
-    console.log(keyPair.publicKey.g, keyPair.publicKey.h);
 
-    // the way of encrypt and decrypt might be wrong
-    let mList = ct.string2asciiCodeList(m);
-    let cList = dlog.encrypt(mList, keyPair.publicKey, p);
-    let c = ct.asciiCodeList2string(cList, true);
-    console.log("crypto:", c);
+    const publicInfo = dlog.genPublicInfo(p, q);
+    console.log("g", publicInfo.g);
 
-    let dListTrue = dlog.decrypt(cList, keyPair.privateKey, keyPair.publicKey);
-    console.log("answer:", ct.asciiCodeList2string(dListTrue));
+    const secretNumA = Math.floor(Math.random() * (q - 1)) + 1;
+    const secretNumB = Math.floor(Math.random() * (q - 1)) + 1;
+    console.log("a", secretNumA);
+    console.log("b", secretNumB);
+    const exchangedInfo = dlog.genExchangedInfo(publicInfo, secretNumA, secretNumB);
+    const privateKey = dlog.genSharedPrivateKey(publicInfo, secretNumA, secretNumB);
+    console.log("key", privateKey);
 
-    let dListFound = dlog.decrypt(cList, dlog.logBaseGofH(keyPair.publicKey), keyPair.publicKey);
-    console.log("guess:", ct.asciiCodeList2string(dListFound));
+    // try to break
+    const guessedKey = dlog.bruteForceFindKey(publicInfo, exchangedInfo);
+    console.log("guess", guessedKey);
 
     // console.log(keyPair.privateKey);
     // let ans = dlog.logBaseGofH(keyPair.publicKey);

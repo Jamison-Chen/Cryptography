@@ -20,32 +20,11 @@ export class Dlog {
         }
     }
     findSmallestGenerator(aCyclicGroup, modP) {
-            for (let each of aCyclicGroup) {
-                if (this.isGenerator(aCyclicGroup, each, modP)) return each;
-            }
+        for (let each of aCyclicGroup) {
+            if (this.isGenerator(aCyclicGroup, each, modP)) return each;
         }
-        // genPrimeEqualTQplusOne(q) {
-        //     let t = 1;
-        //     while (!pt.isPrime(t * q + 1)) {
-        //         t++;
-        //     }
-        //     let prime = t * q + 1;
-        //     return {
-        //         "p": prime,
-        //         "t": t
-        //     };
-        // }
-        // genPrimeOrderSubgroupOfZpStar(q) {
-        //     const pAndT = this.genPrimeEqualTQplusOne(q);
-        //     let p = pAndT.p;
-        //     // becasuse p is a prime, zpStar = {1, 2, 3, ..., p-1} by definition.
-        //     let subgroup = new Set();
-        //     for (let x = 1; x < p; x++) {
-        //         subgroup.add(ct.modularExp(x, pAndT.t, pAndT.p));
-        //     }
-        //     return subgroup;
-        // }
-    genPrimeOrderSubgroupOfZpStar(p, q) {
+    }
+    genOrderQSubgroupOfZpStar(p, q) {
         let t = (p - 1) / q;
         // becasuse p is a prime, zpStar = {1, 2, 3, ..., p-1} by definition.
         let subgroup = new Set();
@@ -90,44 +69,39 @@ export class Dlog {
             }
         }
     }
-    genKeyPair(p, q) {
-        const group = this.genPrimeOrderSubgroupOfZpStar(p, q);
+    genPublicInfo(p, q) {
+        const group = this.genOrderQSubgroupOfZpStar(p, q);
         // choose the smallest element(except 1) as g
         const groupArr = Array.from(group);
         let g = groupArr[1];
         for (let each of groupArr) {
             if (each < g && each != 1) g = each;
         }
-        const h = this.getRandomElemInGroup(group);
-        const x = this.logBaseGofHGivenP(group, g, h, p);
-        let keys = {
-            "publicKey": {
-                "group": group,
-                "g": g,
-                "h": h
-            },
-            "privateKey": {
-                "p": p,
-                "q": q,
-                "x": x
-            }
-        }
-        return keys;
+        return {
+            "group": group,
+            "p": p,
+            "g": g,
+        };
     }
-    encrypt(messageList, publicKey, p) {
-        // assume messageList is a list of integers
-        let cryptoList = [];
-        for (let each of messageList) {
-            cryptoList.push(ct.modularExp(publicKey.g, each, p));
+    genExchangedInfo(publicInfo, secretA, secretB) {
+        const ha = ct.modularExp(publicInfo.g, secretA, publicInfo.p);
+        const hb = ct.modularExp(publicInfo.g, secretB, publicInfo.p);
+        return {
+            "a2b": ha,
+            "b2a": hb
         }
-        return cryptoList;
     }
-    decrypt(cryptoList, privateKey, publicKey) {
-        // assume cryptoList is a list of integers
-        let messageList = [];
-        for (let each of cryptoList) {
-            messageList.push(this.logBaseGofHGivenP(publicKey.group, publicKey.g, each, privateKey.p));
-        }
-        return messageList;
+    genSharedPrivateKey(publicInfo, a, b) {
+        const ex = this.genExchangedInfo(publicInfo, a, b);
+        const keyA = ct.modularExp(ex.b2a, a, publicInfo.p);
+        const keyB = ct.modularExp(ex.a2b, b, publicInfo.p);
+        if (keyA == keyB) return keyA;
+        else return undefined;
+    }
+    bruteForceFindKey(publicInfo, exchangedInfo) {
+        const secretA = this.logBaseGofHGivenP(publicInfo.group, publicInfo.g, exchangedInfo.a2b, publicInfo.p);
+        const secretB = this.logBaseGofHGivenP(publicInfo.group, publicInfo.g, exchangedInfo.b2a, publicInfo.p);
+        const key = ct.modularExp(publicInfo.g, secretA * secretB, publicInfo.p);
+        return key;
     }
 }
