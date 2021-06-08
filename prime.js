@@ -54,6 +54,9 @@ export class PrimeTool {
         }
         return primeList;
     }
+    pi(x) {
+        return this.genPrimeList(x).length;
+    }
     largestPrime(x, approach = 3) {
         if (approach == 3) { // fast
             let i = x;

@@ -76,8 +76,6 @@ function run4() {
 }
 
 function run5() {
-    const m = "If you can read this message, it means that you've succesfully implmented the Dlog algorithm!";
-    console.log("message:", m);
     // choose a bigger prime p and a smaller prime q
     // s.t. p = t * q + 1
     let q = ct.randomPrimePair(8)[0];
@@ -98,6 +96,7 @@ function run5() {
     const secretNumB = Math.floor(Math.random() * (q - 1)) + 1;
     console.log("a", secretNumA);
     console.log("b", secretNumB);
+    // 
     const exchangedInfo = dlog.genExchangedInfo(publicInfo, secretNumA, secretNumB);
     const privateKey = dlog.genSharedPrivateKey(publicInfo, secretNumA, secretNumB);
     console.log("key", privateKey);
@@ -105,10 +104,11 @@ function run5() {
     // try to break
     const guessedKey = dlog.bruteForceFindKey(publicInfo, exchangedInfo);
     console.log("guess", guessedKey);
+}
 
-    // console.log(keyPair.privateKey);
-    // let ans = dlog.logBaseGofH(keyPair.publicKey);
-    // console.log(ans);
+function run6() {
+    const m = "If you can read this message, it means that you've succesfully implmented the Dlog algorithm!";
+    console.log("message:", m);
 }
 
 run5();
