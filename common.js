@@ -28,13 +28,13 @@ export class CommonTool {
         }
         return (data[0][0] ** data[0][1]) % n;
     }
-    modularExp_FLT(a, b, p, q) { // return a^b (mod p*q)
+    modularExp_FLT_CRT(a, b, p, q) { // return a^b (mod p*q)
         let n = p * q;
         if (p == 1 || q == 1) {
             // use Fermat's Little Theorem here
             if (a % n == 0) return 0;
             if (b == (n - 1)) return 1;
-            if (b > (n - 1)) return this.modularExp_FLT(a, b % (n - 1), p, q);
+            if (b > (n - 1)) return this.modularExp_FLT_CRT(a, b % (n - 1), p, q);
             else return this.modularExp(a, b, n);
         } else {
             // use Chinese Remainder Theorem here
@@ -48,8 +48,8 @@ export class CommonTool {
                 alpha = lc[1];
                 beta = lc[0];
             }
-            let pp = this.modularExp_FLT(a, b, p, 1);
-            let qq = this.modularExp_FLT(a, b, q, 1);
+            let pp = this.modularExp_FLT_CRT(a, b, p, 1);
+            let qq = this.modularExp_FLT_CRT(a, b, q, 1);
             let ans = pp * alpha * p + qq * beta * q;
             if (ans < 0) {
                 ans += n;
@@ -73,12 +73,12 @@ export class CommonTool {
         }
         return [p1, p2];
     }
-    string2asciiCodeList(str) {
+    string2ascii(str) {
         let asciiCodeList = [];
         for (let i = 0; i < str.length; i++) asciiCodeList.push(str.charCodeAt(i));
         return asciiCodeList;
     }
-    asciiCodeList2string(aList, forcePrintable = false) {
+    ascii2string(aList, forcePrintable = false) {
         if (forcePrintable) {
             return String.fromCharCode(...aList.map(e => {
                 let remainder = e % 126;

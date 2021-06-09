@@ -32,16 +32,16 @@ function run1() {
     const keyPair = rsa.genKeyPair(p, q);
     console.log(keyPair.publicKey);
 
-    const mList = ct.string2asciiCodeList(m);
+    const mList = ct.string2ascii(m);
     const cList = rsa.encrypt(mList, keyPair.publicKey);
-    const c = ct.asciiCodeList2string(cList, true);
+    const c = ct.ascii2string(cList, true);
     console.log("crypto:", c);
 
     const dListTrue = rsa.decrypt(cList, keyPair.privateKey);
-    console.log("answer:", ct.asciiCodeList2string(dListTrue));
+    console.log("answer:", ct.ascii2string(dListTrue));
 
     const dListFound = rsa.decrypt(cList, rsa.bruteForceFindKey(keyPair.publicKey));
-    console.log("guess:", ct.asciiCodeList2string(dListFound));
+    console.log("guess:", ct.ascii2string(dListFound));
 }
 
 function run2() {

@@ -62,7 +62,7 @@ export class RSA {
         let cryptoList = [];
         for (let each of messageList) {
             // cryptoList.push(ct.modularExp(each, publicKey.e, publicKey.n));
-            cryptoList.push(ct.modularExp_FLT(each, publicKey.e, publicKey.n, 1));
+            cryptoList.push(ct.modularExp_FLT_CRT(each, publicKey.e, publicKey.n, 1));
         }
         return cryptoList;
     }
@@ -70,7 +70,7 @@ export class RSA {
         // assume cryptoList is a list of integers
         let messageList = [];
         for (let each of cryptoList) {
-            messageList.push(ct.modularExp_FLT(each, privateKey.d, privateKey.p, privateKey.q));
+            messageList.push(ct.modularExp_FLT_CRT(each, privateKey.d, privateKey.p, privateKey.q));
         }
         return messageList;
     }

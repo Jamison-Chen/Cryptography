@@ -42,13 +42,12 @@ export class Dlog {
             i++;
         }
     }
-    logBaseGofHGivenP(aGroup, g, h, p) {
-        const order = aGroup.size;
-        for (let i = 0; i < order; i++) {
+    loggHGivenP(g, h, p, q) {
+        for (let i = 0; i < q; i++) {
             if (ct.modularExp(g, i, p) == h) return i;
         }
     }
-    logBaseGofH(publicKey) {
+    loggH(publicKey) {
         const order = publicKey.group.size;
         let aPrime = 2;
         while (true) {
@@ -99,8 +98,8 @@ export class Dlog {
         else return undefined;
     }
     bruteForceFindKey(publicInfo, exchangedInfo) {
-        const secretA = this.logBaseGofHGivenP(publicInfo.group, publicInfo.g, exchangedInfo.a2b, publicInfo.p);
-        const secretB = this.logBaseGofHGivenP(publicInfo.group, publicInfo.g, exchangedInfo.b2a, publicInfo.p);
+        const secretA = this.loggHGivenP(publicInfo.g, exchangedInfo.a2b, publicInfo.p, publicInfo.group.size);
+        const secretB = this.loggHGivenP(publicInfo.g, exchangedInfo.b2a, publicInfo.p, publicInfo.group.size);
         const key = ct.modularExp(publicInfo.g, secretA * secretB, publicInfo.p);
         return key;
     }
