@@ -12,17 +12,16 @@ import {
 } from "./discreteLog.js";
 let ct = new CommonTool();
 let pt = new PrimeTool();
-let rsa = new RSA();
-let dlog = new Dlog();
 
-function run1() {
+function runRSA(bitLength) {
+    let rsa = new RSA();
     const m = "If you can read this message, it means that you've succesfully implmented the RSA algorithm!";
     console.log("message:", m);
     // Due to the issue of computational precision,
     // 25 is the biggest number of bits that won't cause wrong results when converting to p, q to decimal,
     // and calculating p*q.
     // However, a RSA scheme is believed to be secure only when n > 1024 nowadays.
-    const primePair = ct.randomPrimePair(22);
+    const primePair = ct.randomPrimePair(bitLength);
     const p = primePair[0];
     const q = primePair[1];
     // console.log(p, q);
@@ -39,9 +38,14 @@ function run1() {
 
     const dListTrue = rsa.decrypt(cList, keyPair.privateKey);
     console.log("answer:", ct.ascii2string(dListTrue));
-
+    const t0 = new Date().getTime();
     const dListFound = rsa.decrypt(cList, rsa.bruteForceFindKey(keyPair.publicKey));
     console.log("guess:", ct.ascii2string(dListFound));
+    const t1 = new Date().getTime();
+    console.log({
+        "bitLength": bitLength,
+        "timeConsumed": `${(t1-t0)/1000}s`
+    });
 }
 
 function run2() {
@@ -52,6 +56,7 @@ function run2() {
 }
 
 function run3() {
+    let dlog = new Dlog();
     // when p is large enough, it would take some time to generate zpStar
     // but it's still quite fast to find the smallest generator
     let p = ct.randomPrimePair(16)[0];
@@ -63,6 +68,7 @@ function run3() {
 }
 
 function run4() {
+    let dlog = new Dlog();
     const q = ct.randomPrimePair(14)[0];
     console.log(q)
     let g = dlog.genPrimeOrderSubgroupOfZpStar(q);
@@ -76,6 +82,7 @@ function run4() {
 }
 
 function run5() {
+    let dlog = new Dlog();
     // choose a bigger prime p and a smaller prime q
     // s.t. p = t * q + 1
     let q = ct.randomPrimePair(8)[0];
@@ -96,9 +103,9 @@ function run5() {
     const secretNumB = Math.floor(Math.random() * (q - 1)) + 1;
     console.log("a", secretNumA);
     console.log("b", secretNumB);
-    // 
-    const exchangedInfo = dlog.genExchangedInfo(publicInfo, secretNumA, secretNumB);
-    const privateKey = dlog.genSharedPrivateKey(publicInfo, secretNumA, secretNumB);
+
+    const exchangedInfo = dlog.genExchangedInfo(secretNumA, secretNumB);
+    const privateKey = dlog.genSharedPrivateKey();
     console.log("key", privateKey);
 
     // try to break
@@ -111,4 +118,6 @@ function run6() {
     console.log("message:", m);
 }
 
-run5();
+for (let i of[18, 19, 20, 21, 22, 23, 24, 25]) {
+    runRSA(i);
+}

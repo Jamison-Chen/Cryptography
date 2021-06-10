@@ -8,7 +8,18 @@ let pt = new PrimeTool();
 let ct = new CommonTool();
 
 export class Dlog {
-    constructor() {}
+    publicInfo;
+    secretA;
+    secretB;
+    exchangedInfo;
+    sharedPrivateKey;
+    constructor() {
+        this.publicInfo = undefined;
+        this.secretA = undefined;
+        this.secretB = undefined;
+        this.exchangedInfo = undefined;
+        this.sharedPrivateKey = undefined;
+    }
     isGenerator(aCyclicGroup, candidateGenerator, modP) {
         let copy = new Set([...aCyclicGroup]);
         const order = copy.size;
@@ -76,26 +87,33 @@ export class Dlog {
         for (let each of groupArr) {
             if (each < g && each != 1) g = each;
         }
-        return {
+        this.publicInfo = {
             "group": group,
             "p": p,
             "g": g,
         };
+        return this.publicInfo;
     }
-    genExchangedInfo(publicInfo, secretA, secretB) {
-        const ha = ct.modularExp(publicInfo.g, secretA, publicInfo.p);
-        const hb = ct.modularExp(publicInfo.g, secretB, publicInfo.p);
-        return {
-            "a2b": ha,
-            "b2a": hb
+    genExchangedInfo(secretA, secretB) {
+        if (this.publicInfo) {
+            this.secretA = secretA;
+            this.secretB = secretB;
+            const ha = ct.modularExp(this.publicInfo.g, secretA, this.publicInfo.p);
+            const hb = ct.modularExp(this.publicInfo.g, secretB, this.publicInfo.p);
+            this.exchangedInfo = {
+                "a2b": ha,
+                "b2a": hb
+            };
         }
+        return this.exchangedInfo;
     }
-    genSharedPrivateKey(publicInfo, a, b) {
-        const ex = this.genExchangedInfo(publicInfo, a, b);
-        const keyA = ct.modularExp(ex.b2a, a, publicInfo.p);
-        const keyB = ct.modularExp(ex.a2b, b, publicInfo.p);
-        if (keyA == keyB) return keyA;
-        else return undefined;
+    genSharedPrivateKey() {
+        if (this.exchangedInfo && this.secretA && this.secretB && this.publicInfo) {
+            const keyA = ct.modularExp(this.exchangedInfo.b2a, this.secretA, this.publicInfo.p);
+            const keyB = ct.modularExp(this.exchangedInfo.a2b, this.secretB, this.publicInfo.p);
+            if (keyA == keyB) this.sharedPrivateKey = keyA;
+        }
+        return this.sharedPrivateKey;
     }
     bruteForceFindKey(publicInfo, exchangedInfo) {
         const secretA = this.loggHGivenP(publicInfo.g, exchangedInfo.a2b, publicInfo.p, publicInfo.group.size);
