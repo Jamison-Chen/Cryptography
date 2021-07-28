@@ -43,19 +43,34 @@ export class PrimeTool {
                 if (this.isPrime(i)) primeList.push(i);
             }
         } else if (approach == 2) { // sieve of Eratosthenes, faster!
-            primeList = Array.from(Array(x), (_, index) => index + 1);
-            primeList.shift();
-            const upperBound = Math.ceil(x ** 0.5);
-            for (let i = 0; i < primeList.length; i++) {
-                let divisor = primeList[i];
-                if (divisor > upperBound) break;
-                if (this.isPrime(divisor)) primeList = primeList.filter(eachNum => eachNum % divisor != 0 || eachNum == divisor);
+            if (x < 2) return primeList;
+            let arr = Array(x + 1).fill(1);
+            arr[0] = 0;
+            arr[1] = 0;
+            let maxLoop = parseInt(x ** 0.5) + 1
+            for (let i = 2; i < maxLoop; i++) {
+                if (arr[i] === 1) {
+                    for (let j = i * i; j <= x; j += i) arr[j] = 0;
+                }
+            }
+            for (let i = 0; i <= x; i++) {
+                if (arr[i] === 1) primeList.push(i);
             }
         }
         return primeList;
     }
     pi(x) {
-        return this.genPrimeList(x).length;
+        if (x < 2) return 0;
+        let arr = Array(x + 1).fill(1);
+        arr[0] = 0;
+        arr[1] = 0;
+        let maxLoop = parseInt(x ** 0.5) + 1
+        for (let i = 2; i < maxLoop; i++) {
+            if (arr[i] === 1) {
+                for (let j = i * i; j <= x; j += i) arr[j] = 0;
+            }
+        }
+        return arr.reduce((a, b) => a + b);
     }
     largestPrime(x, approach = 3) {
         if (approach == 3) { // fast
@@ -203,3 +218,5 @@ export class PrimeTool {
         return ans;
     }
 }
+
+let pt = new PrimeTool();

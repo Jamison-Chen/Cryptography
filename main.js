@@ -118,6 +118,6 @@ function run6() {
     console.log("message:", m);
 }
 
-for (let i of[18, 19, 20, 21, 22, 23, 24, 25]) {
+for (let i of [18, 19, 20, 21, 22, 23, 24, 25]) {
     runRSA(i);
 }
