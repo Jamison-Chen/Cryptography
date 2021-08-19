@@ -137,7 +137,7 @@ export class PrimeTool {
         }
         return gcd;
     }
-    gcd(a, b) { // fast
+    gcd_bruteForce(a, b) { // slow
         let big = Math.max(a, b);
         let small = Math.min(a, b);
         if (big % small == 0) return small;
@@ -145,6 +145,10 @@ export class PrimeTool {
         for (let i = upperBound; i >= 1; i--) {
             if (small % i == 0 && big % i == 0) return i;
         }
+    }
+    gcd(a, b) { // fast
+        if (a === 0) return b;
+        return this.gcd(b % a, a);
     }
     gcd_euclidean(a, b, matrix) { // fast, only used for acquiring linear combination
         let big = Math.max(a, b);
@@ -218,5 +222,3 @@ export class PrimeTool {
         return ans;
     }
 }
-
-let pt = new PrimeTool();
