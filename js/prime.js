@@ -1,6 +1,7 @@
 export class PrimeTool {
     constructor() {}
-    isPrime(x) { // fast
+    // fast
+    isPrime(x) {
         if (x == 1) return false;
         if (x == 2) return true;
         const upperBound = Math.ceil(x ** 0.5);
@@ -9,45 +10,47 @@ export class PrimeTool {
         }
         return true;
     }
-    isPrime_FLT(x) { // slow, base on Fermat's Little Theorem
+    // slow, base on Fermat's Little Theorem
+    isPrime_FLT(x) {
         if (x == 1) return false;
         for (let i = 1; i < x; i++) {
-            let data = [
-                [i, x - 1]
-            ];
+            let data = [[i, x - 1]];
             // beacuse large base or exponent won't be precisely calculated
             // so we use some properties of modulo operation to solve this problem
             while (!(data[0][0] < x && data[0][1] < 2 && data.length == 1)) {
                 if (data[0][0] == 0) return false;
                 while (data[0][1] >= 2 && data[0][0] < x) {
-                    if (data[0][1] % 2 != 0) data.push([data[0][0], data[0][1] % 2]);
+                    if (data[0][1] % 2 != 0)
+                        data.push([data[0][0], data[0][1] % 2]);
                     data[0][0] *= data[0][0];
                     data[0][1] = Math.floor(data[0][1] / 2);
                 }
                 while (data[0][1] < 2 && data[0][0] < x && data.length > 1) {
                     let toPop = data.pop();
                     let toPopNum = toPop[0] ** toPop[1];
-                    data[0][0] = (data[0][0] ** data[0][1]) * toPopNum;
+                    data[0][0] = data[0][0] ** data[0][1] * toPopNum;
                     data[0][1] = 1;
                 }
                 data[0][0] = data[0][0] % x;
             }
-            if ((data[0][0] ** data[0][1]) % x != 1) return false;
+            if (data[0][0] ** data[0][1] % x != 1) return false;
         }
         return true;
     }
     genPrimeList(x, approach = 2) {
         let primeList = [];
-        if (approach == 1) { // slow
+        if (approach == 1) {
+            // slow
             for (let i = 1; i <= x; i++) {
                 if (this.isPrime(i)) primeList.push(i);
             }
-        } else if (approach == 2) { // sieve of Eratosthenes, faster!
+        } else if (approach == 2) {
+            // sieve of Eratosthenes, faster!
             if (x < 2) return primeList;
             let arr = Array(x + 1).fill(1);
             arr[0] = 0;
             arr[1] = 0;
-            let maxLoop = parseInt(x ** 0.5) + 1
+            let maxLoop = parseInt(x ** 0.5) + 1;
             for (let i = 2; i < maxLoop; i++) {
                 if (arr[i] === 1) {
                     for (let j = i * i; j <= x; j += i) arr[j] = 0;
@@ -64,7 +67,7 @@ export class PrimeTool {
         let arr = Array(x + 1).fill(1);
         arr[0] = 0;
         arr[1] = 0;
-        let maxLoop = parseInt(x ** 0.5) + 1
+        let maxLoop = parseInt(x ** 0.5) + 1;
         for (let i = 2; i < maxLoop; i++) {
             if (arr[i] === 1) {
                 for (let j = i * i; j <= x; j += i) arr[j] = 0;
@@ -73,7 +76,8 @@ export class PrimeTool {
         return arr.reduce((a, b) => a + b);
     }
     largestPrime(x, approach = 3) {
-        if (approach == 3) { // fast
+        if (approach == 3) {
+            // fast
             let i = x;
             while (i >= 2) {
                 if (this.isPrime(i)) return i;
@@ -81,12 +85,14 @@ export class PrimeTool {
                 else i -= 2;
             }
             return 2;
-        } else { // slow
+        } else {
+            // slow
             const l = this.genPrimeList(x, approach);
             return l[l.length - 1];
         }
     }
-    primeFactorization(x) { // fast
+    primeFactorization(x) {
+        // fast
         let primeFactor = {};
         if (this.isPrime(x)) {
             primeFactor[x] = 1;
@@ -109,7 +115,8 @@ export class PrimeTool {
             } else pList.pop();
         }
     }
-    primeFactorization2(x) { // slow
+    primeFactorization2(x) {
+        // slow
         let primeFactor = {};
         let upperBound = Math.ceil(x / 2);
         while (!this.isPrime(x) && x != 1) {
@@ -128,16 +135,19 @@ export class PrimeTool {
 
         return primeFactor;
     }
-    gcd_handConcept(a, b) { // slow, base on the concept used when doing hand-calculating
+    gcd_handConcept(a, b) {
+        // slow, base on the concept used when doing hand-calculating
         let fObj1 = this.primeFactorization(a);
         let fObj2 = this.primeFactorization(b);
         let gcd = 1;
         for (let eachP in fObj1) {
-            if (parseInt(eachP) in fObj2) gcd *= parseInt(eachP) ** Math.min(fObj1[eachP], fObj2[eachP]);
+            if (parseInt(eachP) in fObj2)
+                gcd *= parseInt(eachP) ** Math.min(fObj1[eachP], fObj2[eachP]);
         }
         return gcd;
     }
-    gcd_bruteForce(a, b) { // slow
+    gcd_bruteForce(a, b) {
+        // slow
         let big = Math.max(a, b);
         let small = Math.min(a, b);
         if (big % small == 0) return small;
@@ -146,23 +156,21 @@ export class PrimeTool {
             if (small % i == 0 && big % i == 0) return i;
         }
     }
-    gcd(a, b) { // fast
+    gcd(a, b) {
+        // fast
         if (a === 0) return b;
         return this.gcd(b % a, a);
     }
-    gcd_euclidean(a, b, matrix) { // fast, only used for acquiring linear combination
+    gcd_euclidean(a, b, matrix) {
+        // fast, only used for acquiring linear combination
         let big = Math.max(a, b);
         let small = Math.min(a, b);
         let r = big % small;
-        matrix.push([
-            [1, big],
-            [-1 * Math.floor(big / small), small],
-            r
-        ]);
+        matrix.push([[1, big], [-1 * Math.floor(big / small), small], r]);
         if (r == 0) {
             return {
-                "gcd": small,
-                "data": matrix
+                gcd: small,
+                data: matrix,
             };
         }
         return this.gcd_euclidean(small, r, matrix);
@@ -186,7 +194,8 @@ export class PrimeTool {
             }
         }
         let ans = [data[data.length - 2][1][0], data[data.length - 2][0][0]];
-        while (ans[0] <= 0) { // force the param of the smallNum to be positive
+        while (ans[0] <= 0) {
+            // force the param of the smallNum to be positive
             ans[0] += bigNum;
             ans[1] -= smallNum;
         }
@@ -197,7 +206,7 @@ export class PrimeTool {
         // if n is a prime
         if (this.isPrime(n)) return n - 1;
         // else if n is the product of two different primes
-        let primeFactorResult = this.primeFactorization(n)
+        let primeFactorResult = this.primeFactorization(n);
         let primeList = Object.keys(primeFactorResult);
         if (primeList.length == 2) {
             let allExponentAreOne = true;
@@ -207,7 +216,8 @@ export class PrimeTool {
                     break;
                 }
             }
-            if (allExponentAreOne) return (primeList[0] - 1) * (primeList[1] - 1);
+            if (allExponentAreOne)
+                return (primeList[0] - 1) * (primeList[1] - 1);
         }
         // else
         return this.relativePrimeList(n).length;

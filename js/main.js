@@ -1,21 +1,14 @@
-import {
-    PrimeTool
-} from "./prime.js";
-import {
-    CommonTool
-} from "./common.js";
-import {
-    RSA
-} from "./rsa.js";
-import {
-    Dlog
-} from "./discreteLog.js";
+import { PrimeTool } from "./prime.js";
+import { CommonTool } from "./common.js";
+import { RSA } from "./rsa.js";
+import { Dlog } from "./discreteLog.js";
 let ct = new CommonTool();
 let pt = new PrimeTool();
 
 function runRSA(bitLength) {
     let rsa = new RSA();
-    const m = "If you can read this message, it means that you've succesfully implmented the RSA algorithm!";
+    const m =
+        "If you can read this message, it means that you've succesfully implmented the RSA algorithm!";
     console.log("message:", m);
     // Due to the issue of computational precision,
     // 25 is the biggest number of bits that won't cause wrong results when converting to p, q to decimal,
@@ -39,19 +32,23 @@ function runRSA(bitLength) {
     const dListTrue = rsa.decrypt(cList, keyPair.privateKey);
     console.log("answer:", ct.ascii2string(dListTrue));
     const t0 = new Date().getTime();
-    const dListFound = rsa.decrypt(cList, rsa.bruteForceFindKey(keyPair.publicKey));
+    const dListFound = rsa.decrypt(
+        cList,
+        rsa.bruteForceFindKey(keyPair.publicKey)
+    );
     console.log("guess:", ct.ascii2string(dListFound));
     const t1 = new Date().getTime();
     console.log({
-        "bitLength": bitLength,
-        "timeConsumed": `${(t1-t0)/1000}s`
+        bitLength: bitLength,
+        timeConsumed: `${(t1 - t0) / 1000}s`,
     });
 }
 
 function run2() {
     for (let i = 2; i <= 3000; i++) {
         // you will find out that it's hard to find a euler function's value that is a prime
-        if (pt.isPrime(pt.eulerFunction(i))) console.log(i, pt.eulerFunction(i));
+        if (pt.isPrime(pt.eulerFunction(i)))
+            console.log(i, pt.eulerFunction(i));
     }
 }
 
@@ -70,7 +67,7 @@ function run3() {
 function run4() {
     let dlog = new Dlog();
     const q = ct.randomPrimePair(14)[0];
-    console.log(q)
+    console.log(q);
     let g = dlog.genPrimeOrderSubgroupOfZpStar(q);
     console.log(g.size); // this number should equals q
     let pAndT = dlog.genPrimeEqualTQplusOne(q);
@@ -114,7 +111,8 @@ function run5() {
 }
 
 function run6() {
-    const m = "If you can read this message, it means that you've succesfully implmented the Dlog algorithm!";
+    const m =
+        "If you can read this message, it means that you've succesfully implmented the Dlog algorithm!";
     console.log("message:", m);
 }
 
